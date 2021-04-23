@@ -40,7 +40,8 @@ mongoose.set("useCreateIndex", true);
 const userSchema =  new mongoose.Schema ({
     email: String,
     password: String,
-    googleId: String
+    googleId: String,
+    secret: String
 });
 
 //for hashing & salting passwords and saving in our DB
@@ -113,11 +114,42 @@ app.get("/register", function(req, res){
 
 //secrets page
 app.get("/secrets", function(req, res){
+   User.find({"secret":{$ne: null}}, function(err, foundUser){
+       if(err) {
+           console.log(err);
+       } else {
+           if (foundUser) {
+               res.render("secrets", {userWithSecrets: foundUser});
+           }
+       }
+   });
+});
+
+//submit page
+app.get("/submit", function(req, res){
     if(req.isAuthenticated()){
-        res.render("secrets");
+        res.render("submit");
     } else {
         res.redirect("/login");
     }
+});
+
+//post request for submit
+app.post("/submit", function(req, res){
+    const submittedSecret = req.body.secret;
+    User.findById(req.user.id, function(err, foundUser){
+     if(err) {
+          console.log(err);
+     } else {
+         if(foundUser) {
+             foundUser.secret = submittedSecret;
+             foundUser.save(function(){
+                 res.redirect("/secrets");
+             });
+         }
+     }
+    });
+
 });
 
 //post request for register
