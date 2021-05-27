@@ -33,7 +33,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //connecting database
-mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
+mongoose.connect(process.env.MONGODB_ID, {useNewUrlParser: true});
 mongoose.set("useCreateIndex", true);
 // user Schema with mongooose Schema for encryption
 
